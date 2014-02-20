@@ -53,3 +53,7 @@ The broad vision is armies and supply lines represented on a global scale on a w
 * Different scale commanders (global commander, continent commanders)
 
 * Touch-input/mobile/table versions.
+
+# Notes on development
+
+* We're using tiles from Cloudmade. I followed a tutorial [here](http://learnjs.io/blog/2013/11/08/leaflet-basics/) to help with Leaflet, and we'll need to use a [Cloudmade account](http://cloudmade.com/) to get our tiles, or get our own tiles.
