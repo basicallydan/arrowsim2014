@@ -27,7 +27,8 @@ xhr('/world-countries.json', { json : true }, function (data) {
 	var states = L.geoJson(data, {
 		onEachFeature: function(feature, layer){
 			layer.on({
-				click: drawArrow
+				click: addArrowSegment,	
+				contextmenu: drawCircle
 			})
 		}
 	}).addTo(map);
@@ -39,9 +40,18 @@ xhr('/world-countries.json', { json : true }, function (data) {
 
 
 
-map.on('click', drawArrow);
+map.on('contextmenu', drawCircle);
 
-function drawArrow(mouseEvent) {
-	var rectangleBounds = [[]];
+map.on('click', addArrowSegment);
+
+
+var arrowPolyline = L.polyline([], {color: 'purple'}).addTo(map);
+function addArrowSegment(mouseEvent) {
+	arrowPolyline.addLatLng(mouseEvent.latlng);
+	arrowPolyline.redraw();	
+}
+
+
+function drawCircle(mouseEvent) {	
 	L.circle(mouseEvent.latlng, 100000, {color: '#FF5454'}).addTo(map);
 }
