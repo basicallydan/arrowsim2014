@@ -1,5 +1,7 @@
 I nicked world-countries.json from https://bitbucket.org/john2x/d3test/src/2ce4dd511244/d3/examples/data/world-countries.json
 
+You need [browserify](http://browserify.org) to compile the code. Install it using `npm install -g browserify` then run `npm install` inside this directory. You can then compile using `browserify index.js -o bundle.js`.
+
 Run `ruby -rwebrick -e'WEBrick::HTTPServer.new(:Port => 3000, :DocumentRoot => Dir.pwd).start'` in this directory and go to http://localhost:3000.
 
 ## What is 'Arrow Simulator 2014'

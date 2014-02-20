@@ -1,8 +1,18 @@
-require('mapbox.js');
+var L = require('leaflet');
+L.Icon.Default.imagePath = 'node_modules/leaflet/dist/images/';
 var path = require('path');
-var map = L.mapbox.map('map', 'arrowsim.hadb7j5h').setView([40, -74.50], 9);
+var map = L.map('map').setView([40, -74.50], 9);
 var xhr = require('xhr-browserify');
 var canvasTiles = L.tileLayer.canvas();
+
+var attribution = 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://cloudmade.com">CloudMade</a>';
+ 
+var tiles = 'http://{s}.tile.cloudmade.com/BC9A493B41014CAABB98F0471D759707/997/256/{z}/{x}/{y}.png';
+ 
+L.tileLayer(tiles, {
+  maxZoom: 18,
+  attribution: attribution
+}).addTo(map);
 
 canvasTiles.drawTile = function(canvas, tilePoint, zoom) {
 	var ctx = canvas.getContext('2d');
@@ -10,6 +20,7 @@ canvasTiles.drawTile = function(canvas, tilePoint, zoom) {
 };
 
 map.addLayer(canvasTiles);
+
 
 // Get a file
 xhr('/world-countries.json', { json : true }, function (data) {
