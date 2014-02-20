@@ -14,19 +14,34 @@ L.tileLayer(tiles, {
   attribution: attribution
 }).addTo(map);
 
-canvasTiles.drawTile = function(canvas, tilePoint, zoom) {
+/*canvasTiles.drawTile = function(canvas, tilePoint, zoom) {
 	var ctx = canvas.getContext('2d');
     ctx.fillRect(25,25,100,100);
 };
 
-map.addLayer(canvasTiles);
+map.addLayer(canvasTiles);*/
 
 
 // Get a file
 xhr('/world-countries.json', { json : true }, function (data) {
-	var states = L.geoJson(data).addTo(map);
+	var states = L.geoJson(data, {
+		onEachFeature: function(feature, layer){
+			layer.on({
+				click: drawArrow
+			})
+		}
+	}).addTo(map);
 	// var latLngs = data.match(/-?[0-9]+\.[0-9]+?, ?-?[0-9]+\.[0-9]+/g);
 	// latLngs.forEach(function (ll) {
-	// 	console.log(ll);
+	// console.log(ll);
 	// });
 });
+
+
+
+map.on('click', drawArrow);
+
+function drawArrow(mouseEvent) {
+	var rectangleBounds = [[]];
+	L.circle(mouseEvent.latlng, 100000, {color: '#FF5454'}).addTo(map);
+}
