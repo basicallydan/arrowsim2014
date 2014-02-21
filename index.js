@@ -26,6 +26,10 @@ territories.load(map);
 
 map.on('click', addArrowSegment);
 
+L.LatLng.prototype.setPrecision = function(decimalPlaces) {
+	this.lat = +this.lat.toFixed(decimalPlaces);
+	this.lng = +this.lng.toFixed(decimalPlaces);
+};
 
 L.LatLng.prototype.rotateLatitudeAround = function(angle, center) {
     this.lat = center.lat + (Math.cos(Math.toRadians(angle)) * (this.lat - center.lat) - Math.sin(Math.toRadians(angle)) * (this.lng - center.lng));
@@ -58,7 +62,9 @@ var arrowPolyline = L.polyline([], {color: 'purple'}).addTo(map);
 arrowPolyline.dragging = false;
 function addArrowSegment(mouseEvent) {
 	// console.log('LatLng Clicked:', mouseEvent.latlng);
-	arrowPolyline.addLatLng(mouseEvent.latlng);
+	var newPoint = mouseEvent.latlng;
+	newPoint.setPrecision(4);
+	arrowPolyline.addLatLng(newPoint);
 	arrowPolyline.redraw();
 }
 
