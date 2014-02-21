@@ -1,5 +1,3 @@
-I nicked world-countries.json from https://bitbucket.org/john2x/d3test/src/2ce4dd511244/d3/examples/data/world-countries.json
-
 You need [browserify](http://browserify.org) to compile the code. Install it using `npm install -g browserify` then run `npm install` inside this directory. You can then compile using `browserify index.js -o bundle.js`.
 
 Run `ruby -rwebrick -e'WEBrick::HTTPServer.new(:Port => 3000, :DocumentRoot => Dir.pwd).start'` in this directory and go to http://localhost:3000.
@@ -57,3 +55,6 @@ The broad vision is armies and supply lines represented on a global scale on a w
 # Notes on development
 
 * We're using tiles from Cloudmade. I followed a tutorial [here](http://learnjs.io/blog/2013/11/08/leaflet-basics/) to help with Leaflet, and we'll need to use a [Cloudmade account](http://cloudmade.com/) to get our tiles, or get our own tiles.
+
+* We're using country geoJson data from https://github.com/johan/world.geo.json
+

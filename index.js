@@ -25,6 +25,19 @@ L.tileLayer(tiles, {
 map.addLayer(canvasTiles);*/
 
 
+// Load Country Json
+xhr("/geoJson/countries.geo.json", { json: true }, function(countriesJson) {
+    L.geoJson(countriesJson, {
+    	style: function(feature) {
+    		return {
+    			color: "#444",
+    			fillOpacity: 0
+    		};
+    	}
+    })
+});
+
+/*
 // Get a file
 xhr('/world-countries.json', { json : true }, function (data) {
 	var states = L.geoJson(data, {
@@ -40,7 +53,7 @@ xhr('/world-countries.json', { json : true }, function (data) {
 	// console.log(ll);
 	// });
 });
-
+*/
 
 
 // map.on('contextmenu', drawCircle);
