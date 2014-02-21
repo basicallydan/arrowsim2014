@@ -4,6 +4,9 @@ var path = require('path');
 var map = L.map('map').setView([40, -74.50], 9);
 var xhr = require('xhr-browserify');
 var canvasTiles = L.tileLayer.canvas();
+Math.toRadians = function (degrees) {
+	return (degrees * (Math.PI / 180));
+};
 
 var attribution = 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://cloudmade.com">CloudMade</a>';
  
@@ -40,18 +43,63 @@ xhr('/world-countries.json', { json : true }, function (data) {
 
 
 
-map.on('contextmenu', drawCircle);
+// map.on('contextmenu', drawCircle);
 
 map.on('click', addArrowSegment);
 
 
+L.LatLng.prototype.rotateLatitudeAround = function(angle, center) {
+    this.lat = center.lat + (Math.cos(Math.toRadians(angle)) * (this.lat - center.lat) - Math.sin(Math.toRadians(angle)) * (this.lng - center.lng));
+};
+
+L.LatLng.prototype.rotateLongitudeAround = function(angle, center) {
+    this.lng = center.lng + (Math.sin(Math.toRadians(angle)) * (this.lat - center.lat) + Math.cos(Math.toRadians(angle)) * (this.lng - center.lng));
+};
+
+L.Path.prototype.rotate = function (angle, center) {
+	var oldPoints = arrowPolyline.getLatLngs();
+	if (!center) {
+		center = L.latLng(oldPoints[0].lat, oldPoints[0].lng);
+	} else if (typeof center === 'array') {
+		center = L.latLng(oldPoints[0][0], oldPoints[0][1]);
+	}
+	var newPoints = [];
+
+	oldPoints.forEach(function (p) {
+		var newPoint = L.latLng(p.lat, p.lng);
+		newPoint.rotateLongitudeAround(10, oldPoints[0]);
+		newPoint.rotateLatitudeAround(10, oldPoints[0]);
+		newPoints.push(newPoint);
+	});
+
+	this.setLatLngs(newPoints);
+};
+
 var arrowPolyline = L.polyline([], {color: 'purple'}).addTo(map);
+arrowPolyline.dragging = false;
 function addArrowSegment(mouseEvent) {
+	// console.log('LatLng Clicked:', mouseEvent.latlng);
 	arrowPolyline.addLatLng(mouseEvent.latlng);
-	arrowPolyline.redraw();	
+	arrowPolyline.redraw();
 }
 
+arrowPolyline.on('mousedown', function (mouseEvent) {
+	arrowPolyline.dragging = true;
+	console.log('Mouse down on polyline');
+});
 
-function drawCircle(mouseEvent) {	
+map.on('mouseup', function (mouseEvent) {
+	arrowPolyline.dragging = false;
+});
+
+map.on('mousemove', function (mouseEvent) {
+	if (arrowPolyline.dragging) {
+		console.log('Mouse move on map', mouseEvent);
+		arrowPolyline.rotate(1);
+		return false;
+	}
+});
+
+function drawCircle(mouseEvent) {
 	L.circle(mouseEvent.latlng, 100000, {color: '#FF5454'}).addTo(map);
 }
