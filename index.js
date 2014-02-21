@@ -1,12 +1,15 @@
 var L = require('leaflet');
 L.Icon.Default.imagePath = 'node_modules/leaflet/dist/images/';
 var path = require('path');
-var map = L.map('map').setView([40, -74.50], 9);
-var xhr = require('xhr-browserify');
+var map = L.map('map').setView([51.5, 0.13], 2);
 var canvasTiles = L.tileLayer.canvas();
 Math.toRadians = function (degrees) {
 	return (degrees * (Math.PI / 180));
 };
+
+var territories = require('./territories');
+
+var terr
 
 var attribution = 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://cloudmade.com">CloudMade</a>';
  
@@ -17,44 +20,7 @@ L.tileLayer(tiles, {
   attribution: attribution
 }).addTo(map);
 
-/*canvasTiles.drawTile = function(canvas, tilePoint, zoom) {
-	var ctx = canvas.getContext('2d');
-    ctx.fillRect(25,25,100,100);
-};
-
-map.addLayer(canvasTiles);*/
-
-
-// Load Country Json
-xhr("/geoJson/countries.geo.json", { json: true }, function(countriesJson) {
-    L.geoJson(countriesJson, {
-    	style: function(feature) {
-    		return {
-    			color: "#444",
-    			fillOpacity: 0
-    		};
-    	}
-    })
-});
-
-/*
-// Get a file
-xhr('/world-countries.json', { json : true }, function (data) {
-	var states = L.geoJson(data, {
-		onEachFeature: function(feature, layer){
-			layer.on({
-				click: addArrowSegment,	
-				contextmenu: drawCircle
-			})
-		}
-	}).addTo(map);
-	// var latLngs = data.match(/-?[0-9]+\.[0-9]+?, ?-?[0-9]+\.[0-9]+/g);
-	// latLngs.forEach(function (ll) {
-	// console.log(ll);
-	// });
-});
-*/
-
+territories.load(map);
 
 // map.on('contextmenu', drawCircle);
 
