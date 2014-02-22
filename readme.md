@@ -8,6 +8,41 @@ It's a game concept. An RTS of sorts, where wars are won by attrition and strate
 
 The broad vision is armies and supply lines represented on a global scale on a world map by 'tactical arrows' (think dad's army opening). Battle lines are drawn with arrows impacting each other and armies are pushed back in wars of attrition rather than bulldozed by the best min-maxer. Supply lines and reinforcements are the key to long drawn out engagements.
 
+## UX Interaction
+
+3 core game objects - The Map, Territories and Armies (arrows).
+
+### Map
+
+Normal map interactions, these may be overridden if the user clicks on territories/armies.
+
+* Click and drag to move
+
+* Double click to zoom
+
+* Scroll wheel scales map
+
+### Territories
+
+* Mouse hover over a territories for information (how will this work on mobile? maybe not have it at all)
+
+* Click to select, shows hover over info
+
+* Right click gives territory options (including selecting standing reinforcements, which then can be ordered into a moving army/arrow - this is how armies get started)
+
+### Armies
+
+* Click to select an existing army
+
+* Click and drag an army spearhead (arrow-head) to get a ghost-representation of possible moves
+
+* Click and drag on the stem to split army reinforcements at that point (producing a new army/arrowhead at that point), lets you choose % split between the two new armies.
+
+* Clicking on a junction lets you reassign the %, including stopping reinforcements to one split altogether (and that stem will eventually flow entirely into its arrowhead) - (should this be a right click action?)
+
+* Right-clicking an arrow head lets you tell it to retreat. Which will make the army 'flow' back to the last junction or territory.
+
+
 ## MVP features
 
 * Display world map
