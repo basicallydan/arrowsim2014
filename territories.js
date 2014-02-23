@@ -1,8 +1,25 @@
 var L = require('leaflet');
 var xhr = require('xhr-browserify');
 
+var territoryInfoControl = L.control();
+
 var territoryGeoJsonLayer;
 var selectedTerritory;
+var map;
+
+territoryInfoControl.onAdd = function(map) {
+	var territoryProps = selectedTerritory.feature.properties;
+	territoryProps.owner = territoryProps.owner || "Independent";
+	this._div = L.DomUtil.create('div', 'territory-info');
+	this._div.innerHTML =
+		"<p>" +
+			"<span class='info-header'>Territory: </span>" + territoryProps.name +
+		"</p>" +
+		"<p>" +
+		"<span class='info-header'>Status: </span>" + territoryProps.owner +
+		"</p>";
+    return this._div;
+}
 
 function highlightTerritory(territory) {
 
@@ -20,8 +37,6 @@ function highlightTerritory(territory) {
 function selectTerritory(territory) {
 
 	var territoryProps = territory.feature.properties;
-	
-	territoryProps.selected = true;
 
 	territory.setStyle({
 		stroke: false,
@@ -56,14 +71,21 @@ function clickTerritoryEvent(e) {
 	if (e.target === selectedTerritory) {
 		resetTerritory(e.target);
 		selectedTerritory = undefined;
+		territoryInfoControl.removeFrom(map);
 	} else {
-		selectTerritory(e.target);
 		resetTerritory(selectedTerritory);
+		if (selectedTerritory) {
+			territoryInfoControl.removeFrom(map);
+		}
+
 		selectedTerritory = e.target;
+		selectTerritory(e.target);
+		territoryInfoControl.addTo(map);
 	}
 }
 
-function load(map) {
+function load(inputMap) {
+	map = inputMap;
 	xhr("/geoJson/countries.geo.json", { json: true }, function(countriesJson) {
 	    territoryGeoJsonLayer = L.geoJson(countriesJson, {
 	    	style: function(feature) {
@@ -78,8 +100,6 @@ function load(map) {
 					mouseout: mouseOutTerritoryEvent,
 					click: clickTerritoryEvent
 				})
-
-				layer.bindPopup(feature.properties.name);
 			}
 	    }).addTo(map);
 	});
