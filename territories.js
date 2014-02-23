@@ -55,6 +55,7 @@ function mouseOutTerritoryEvent(e) {
 function clickTerritoryEvent(e) {
 	if (e.target === selectedTerritory) {
 		resetTerritory(e.target);
+		selectedTerritory = undefined;
 	} else {
 		selectTerritory(e.target);
 		resetTerritory(selectedTerritory);
@@ -77,6 +78,8 @@ function load(map) {
 					mouseout: mouseOutTerritoryEvent,
 					click: clickTerritoryEvent
 				})
+
+				layer.bindPopup(feature.properties.name);
 			}
 	    }).addTo(map);
 	});
