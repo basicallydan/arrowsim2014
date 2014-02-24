@@ -1,6 +1,8 @@
+require('./polyfills');
 var L = require('leaflet');
 L.Icon.Default.imagePath = 'node_modules/leaflet/dist/images/';
 var path = require('path');
+var GameLoop = require('./gameLoop');
 
 var map = L.map('map', {
 	center: [51.5,0.13],
@@ -87,6 +89,15 @@ map.on('mousemove', function (mouseEvent) {
 		arrowPolyline.rotate(1);
 		return false;
 	}
+});
+
+// Basic game loop. Yay
+var gameLoop = new GameLoop();
+gameLoop.on('500', function () {
+	console.log('500ms have passed');
+});
+gameLoop.on('1s', function () {
+	console.log('1s has passed');
 });
 
 function drawCircle(mouseEvent) {

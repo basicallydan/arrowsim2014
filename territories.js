@@ -6,6 +6,8 @@ var territoryInfoControl = L.control();
 var territoryLayerGroup;
 var selectedTerritory;
 var map;
+var _ = require('underscore');
+var Territory = require('./territory');
 
 var styles = {
 	red : {
@@ -72,7 +74,7 @@ territoryInfoControl.onAdd = function(map) {
 		"<span class='info-header'>Status: </span>" + territoryProps.owner +
 		"</p>";
 	return this._div;
-}
+};
 
 function highlightTerritory(territory) {
 	var owner = territory.feature.properties.owner;
@@ -94,9 +96,9 @@ function selectTerritory(territory) {
 }
 
 function resetTerritory(territory) {
-	if (territory){
+	if (territory) {
 		territoryLayerGroup.resetStyle(territory);
-	}	
+	}
 }
 
 function mouseoverTerritoryEvent(e) {
@@ -134,59 +136,57 @@ function getSelectedTerritory() {
 	return selectedTerritory;
 }
 
-function getTerritory(territoryId) {
-	var territories = territoryLayerGroup.getLayers();
-	for (territory in territories){
-		if ( territory.feature.id === territoryId) {
-			return territory;
-		}
-	}
+function getTerritoryLayer(territoryId) {
+	var territoryLayers = territoryLayerGroup.getLayers();
+	return _.find(territoryLayers, function (t) {
+		return t.feature.id === territoryId;
+	});
 }
 
-function captureTerritory(territoryId, owner) {
-	var territories = territoryLayerGroup.getLayers();
-	for (var i in territories){
-		var territory = territories[i];
-		if ( territory.feature.id === territoryId) {
-			territory.feature.properties.owner = owner;
-			if (territory === selectedTerritory) {
-				territory.setStyle(styles[owner].selected);
-			} else {
-				territory.setStyle(styles[owner].highlight);
-			}
-			return;
-		}
+function captureTerritory(territory, owner) {
+	var territoryLayer = getTerritoryLayer(territory.id);
+	territoryLayer.feature.properties.owner = owner;
+	if (territoryLayer === selectedTerritory) {
+		territoryLayer.setStyle(styles[owner].selected);
+	} else {
+		territoryLayer.setStyle(styles[owner].highlight);
 	}
 }
 
 function load(inputMap) {
 	map = inputMap;
-	xhr("/geoJson/countries.geo.json", { json: true }, function(countriesJson) {
+	xhr("/geoJson/countries.geo.json", { json: true }, function (countriesJson) {
 		territoryLayerGroup = L.geoJson(countriesJson, {
 			style: function(feature) {
 				var owner = feature.properties.owner || 'neutral';
 				return styles[owner].base;
 			},
 			onEachFeature: function(feature, layer){
+				var territory = new Territory(feature, layer);
+				territory.on('capture', captureTerritory);
 				feature.properties.owner = 'neutral';
+				feature.properties.territory = territory;
 				layer.on({
 					mouseover: mouseoverTerritoryEvent,
 					mouseout: mouseOutTerritoryEvent,
 					click: clickTerritoryEvent,
-					contextmenu: function randomlyCaptureTerritory() {
+					contextmenu: function randomlyCaptureTerritory () {
+						// var randomTeam = teams[_.random(0, teams.length - 1)];
+						// captureTerritory(feature.id, randomTeam);
 						var teams = ['blue', 'red', 'neutral'];
-						var randomTeam = teams[Math.floor(Math.random()*teams.length)]
-						captureTerritory(feature.id, randomTeam);
+						territory.captureBy(teams[_.random(0, teams.length - 1)]);
 					}
-				})
+				});
 			}
-		}).addTo(map);
+		});
+
+		territoryLayerGroup.addTo(map);
 	});
 }
 
 module.exports = {
 	getSelectedTerritory: getSelectedTerritory,
-	getTerritory: getTerritory,
+	getTerritoryLayer: getTerritoryLayer,
 	captureTerritory: captureTerritory,
 	load: load
-}
+};

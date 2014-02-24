@@ -10,7 +10,8 @@
   "license": "ISC",
   "dependencies": {
     "leaflet": "~0.7.2",
-    "xhr-browserify": "https://github.com/basicallydan/xhr-browserify/tarball/master"
+    "xhr-browserify": "https://github.com/basicallydan/xhr-browserify/tarball/master",
+    "underscore": "~1.6.0"
   },
   "devDependencies": {
     "http": "0.0.0",
@@ -20,6 +21,7 @@
     "gulp-util": "~2.2.14",
     "gulp-browserify": "~0.4.6",
     "gulp": "~3.5.2",
-    "gulp-concat": "~2.1.7"
+    "gulp-concat": "~2.1.7",
+    "vows": "~0.7.0"
   }
 }
