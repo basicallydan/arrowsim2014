@@ -28,8 +28,6 @@ L.tileLayer(tiles, {
 
 territories.load(map);
 
-// map.on('contextmenu', drawCircle);
-
 map.on('click', addArrowSegment);
 
 L.LatLng.prototype.setPrecision = function(decimalPlaces) {
