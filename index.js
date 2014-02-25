@@ -99,6 +99,11 @@ gameLoop.on('500', function () {
 gameLoop.on('1s', function () {
 	console.log('1s has passed');
 });
+gameLoop.on('1200ms', function () {
+	console.log('1.2s has passed');
+});
+
+gameLoop.start();
 
 function drawCircle(mouseEvent) {
 	L.circle(mouseEvent.latlng, 100000, {color: '#FF5454'}).addTo(map);

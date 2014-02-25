@@ -18,7 +18,9 @@ function greatestCommonFactor(intervals) {
 function GameLoop() {
 	this.intervalId = undefined;
 	this.intervalLength = undefined;
-	this.intervalsToEmit = [];
+	this.intervalsToEmit = {};
+	this.currentTick = 1;
+	this.maxTicks = 0;
 	this.on('newListener', function (e) {
 		var intervalGroups = intervalParser.exec(e);
 		var intervalAmount = +intervalGroups[1];
@@ -39,9 +41,11 @@ function GameLoop() {
 			return false;
 		}
 
-		this.intervalsToEmit.push(intervalAmount);
+		this.intervalsToEmit[+intervalAmount] = _.union(this.intervalsToEmit[+intervalAmount] || [], [e]);
 
-		this.intervalLength = greatestCommonFactor(this.intervalsToEmit);
+		this.intervalLength = greatestCommonFactor(_.keys(this.intervalsToEmit));
+
+		this.maxTicks = _.max(_.map(_.keys(this.intervalsToEmit), function(a) { return +a; })) / this.intervalLength;
 
 		// We assume that they mean ms if they don't specify
 		console.log('Now emitting event every', intervalAmount, 'milliseconds and the interval length is', this.intervalLength);
@@ -54,13 +58,35 @@ GameLoop.prototype.start = function () {
 	if (!this.intervalLength) {
 		return console.warn('You haven\'t specified any interval callbacks. Use gameLoop.on(\'500ms\', function () { ... }) to do so, and then you can start');
 	}
+	if (this.intervalId) {
+		return console.log('No need to start the loop again, it\'s already started.')
+	}
 	this.intervalId = setInterval(function () {
+		var milliseconds = this.currentTick * this.intervalLength;
+		console.log('Checking at', milliseconds, 'ms','with interval length',this.intervalLength);
+		_.each(this.intervalsToEmit, function (events, key) {
+			if (milliseconds % key === 0) {
+				_.each(events, function(e) { this.emit(e); }.bind(this));
+			}
+		}.bind(this));
+		this.currentTick += 1;
+		if (this.currentTick > this.maxTicks) {
+			this.currentTick = 1;
+		}
+	}.bind(this), this.intervalLength);
 
-	}, this.intervalLength);
+	window.addEventListener('focus', function() {
+		this.start();
+	}.bind(this));
+
+	window.addEventListener('blur', function() {
+		this.stop();
+	}.bind(this));
 };
 
 GameLoop.prototype.stop = function () {
 	clearInterval(this.intervalId);
+	this.intervalId = undefined;
 };
 
 module.exports = GameLoop;
