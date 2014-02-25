@@ -54,34 +54,40 @@ function GameLoop() {
 
 GameLoop.inherits(EventEmitter);
 
+GameLoop.prototype.tick = function () {
+	var milliseconds = this.currentTick * this.intervalLength;
+	_.each(this.intervalsToEmit, function (events, key) {
+		if (milliseconds % key === 0) {
+			_.each(events, function(e) { this.emit(e, e); }.bind(this));
+		}
+	}.bind(this));
+	this.currentTick += 1;
+	if (this.currentTick > this.maxTicks) {
+		this.currentTick = 1;
+	}
+};
+
 GameLoop.prototype.start = function () {
 	if (!this.intervalLength) {
-		return console.warn('You haven\'t specified any interval callbacks. Use gameLoop.on(\'500ms\', function () { ... }) to do so, and then you can start');
+		return console.warn('You haven\'t specified any interval callbacks. Use EventedLoop.on(\'500ms\', function () { ... }) to do so, and then you can start');
 	}
 	if (this.intervalId) {
 		return console.log('No need to start the loop again, it\'s already started.')
 	}
-	this.intervalId = setInterval(function () {
-		var milliseconds = this.currentTick * this.intervalLength;
-		console.log('Checking at', milliseconds, 'ms','with interval length',this.intervalLength);
-		_.each(this.intervalsToEmit, function (events, key) {
-			if (milliseconds % key === 0) {
-				_.each(events, function(e) { this.emit(e); }.bind(this));
-			}
+
+	this.intervalId = setInterval(this.tick.bind(this), this.intervalLength);
+
+	if (window && !this.listeningForFocus) {
+		window.addEventListener('focus', function() {
+			this.start();
 		}.bind(this));
-		this.currentTick += 1;
-		if (this.currentTick > this.maxTicks) {
-			this.currentTick = 1;
-		}
-	}.bind(this), this.intervalLength);
 
-	window.addEventListener('focus', function() {
-		this.start();
-	}.bind(this));
+		window.addEventListener('blur', function() {
+			this.stop();
+		}.bind(this));
 
-	window.addEventListener('blur', function() {
-		this.stop();
-	}.bind(this));
+		this.listeningForFocus = true;
+	}
 };
 
 GameLoop.prototype.stop = function () {
